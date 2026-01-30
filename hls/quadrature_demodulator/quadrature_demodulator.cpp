@@ -16,7 +16,6 @@ void quadrature_demodulator(hls::stream<axis_in_t>& real, hls::stream<axis_in_t>
 #pragma HLS INTERFACE mode = axis port = imag
 #pragma HLS INTERFACE mode = axis port = output
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return 
-#pragma HLS PIPELINE II = 1
 
     static complex_t shift_register_real[NUM_TAPS];
     static complex_t shitf_register_imag[NUM_TAPS];

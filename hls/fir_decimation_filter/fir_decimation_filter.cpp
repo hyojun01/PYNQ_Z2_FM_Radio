@@ -16,7 +16,6 @@ void fir_decimation_filter(hls::stream<axis_t>& input, hls::stream<axis_t>& outp
 #pragma HLS INTERFACE mode = axis port = input
 #pragma HLS INTERFACE mode = axis port = output
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return 
-#pragma HLS PIPELINE II = 1
 
     static const coef_t coefficient[DECIMATION_FACTOR][5] = {
         {0.0193289951, 0.0263706029, 0.0934108918, -0.0620798848, -0.0234956754 },
