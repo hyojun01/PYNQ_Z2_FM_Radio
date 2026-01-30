@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Jan 30 20:11:40 2026" VIVADOVERSION="2023.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Jan 30 20:38:03 2026" VIVADOVERSION="2023.2">
 
   <SYSTEMINFO ARCH="zynq" BOARD="tul.com.tw:pynq-z2:part0:1.0" DEVICE="7z020" NAME="design_1" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -3121,7 +3121,7 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE COREREVISION="2114459168" FULLNAME="/fm_demodulation/quadrature_demodulat_0" HWVERSION="1.0" INSTANCE="fm_demodulation_quadrature_demodulat_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="quadrature_demodulator" VLNV="xilinx.com:hls:quadrature_demodulator:1.0">
+    <MODULE COREREVISION="2114459193" FULLNAME="/fm_demodulation/quadrature_demodulat_0" HWVERSION="1.0" INSTANCE="fm_demodulation_quadrature_demodulat_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="quadrature_demodulator" VLNV="xilinx.com:hls:quadrature_demodulator:1.0">
       <DOCUMENTS/>
       <PARAMETERS>
         <PARAMETER NAME="Component_Name" VALUE="design_1_quadrature_demodulat_0_0"/>
