@@ -4,7 +4,7 @@
 #include "ap_axi_sdata.h"
 
 typedef ap_fixed<32, 10> acc_t;
-typedef ap_fixed<8, 1> complex_t;
+typedef ap_fixed<16, 1> complex_t;
 typedef hls::axis<complex_t, 0, 0, 0> axis_in_t;
 typedef ap_fixed<16, 1> data_t;
 typedef hls::axis<data_t, 0, 0, 0> axis_out_t;
@@ -31,7 +31,7 @@ void quadrature_demodulator(hls::stream<axis_in_t>& real, hls::stream<axis_in_t>
     acc_t diff_imag;
 
     // const data_t scaling_factor = 61274.6530904;
-    const acc_t scaling_factor = 0.814873;
+    const acc_t scaling_factor = 8;
 
     // Operation
 

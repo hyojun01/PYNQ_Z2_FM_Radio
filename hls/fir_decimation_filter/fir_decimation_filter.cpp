@@ -7,38 +7,41 @@
 #define DECIMATION_FACTOR 5
 
 typedef ap_fixed<16, 1> coef_t;
-typedef ap_fixed<8, 1> data_t;
+typedef ap_fixed<8, 1> input_t;
+typedef ap_fixed<16, 1> output_t;
 typedef ap_fixed<32, 10> acc_t;
-typedef hls::axis<data_t, 0, 0, 0> axis_t;
+typedef hls::axis<input_t, 0, 0, 0> in_axis_t;
+typedef hls::axis<output_t, 0, 0, 0> out_axis_t;
 typedef ap_uint<3> count_t;
 
-void fir_decimation_filter(hls::stream<axis_t>& input, hls::stream<axis_t>& output) {
+void fir_decimation_filter(hls::stream<in_axis_t>& input, hls::stream<out_axis_t>& output) {
 #pragma HLS INTERFACE mode = axis port = input
 #pragma HLS INTERFACE mode = axis port = output
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return 
 
     static const coef_t coefficient[DECIMATION_FACTOR][5] = {
-        {0.0193289951, 0.0263706029, 0.0934108918, -0.0620798848, -0.0234956754 },
-        {0.0996113346, 0.0498237899, 0.3025603220, -0.0751905724, -0.0303894120 },
-        {-0.0138526849, 0.0000086279, 0.3999505120, 0.0000086279, -0.0138526849 },
-        {-0.0303894120, -0.0751905724, 0.3025603220, 0.0498237899, 0.0996113346 },
-        {-0.0234956754, -0.0620798848, 0.0934108918, 0.0263706029, 0.0193289951 }
+        {-0.00222778, 0.01422119, 0.14111328, 0.01925659, 0.019104 },
+        {-0.00692749, -0.01397705, 0.26159668, -0.04702759, 0.00759888 },
+        {-0.00299072, -0.04763794, 0.3119812, -0.04763794, -0.00299072 },
+        {0.00759888, -0.04702759, 0.26159668, -0.01397705, -0.00692749 },
+        {0.019104, 0.01925659, 0.14111328, 0.01422119, -0.00222778 }
     };
-    static data_t shift_register[DECIMATION_FACTOR][5];
+    static input_t shift_register[DECIMATION_FACTOR][5];
     #pragma HLS ARRAY_PARTITION variable = coefficient type = complete dim = 0
     #pragma HLS ARRAY_PARTITION variable = shift_register type = complete dim = 0
 
     static count_t count = 0;
     static acc_t sum = 0;
-    axis_t temp;
+    in_axis_t input_temp;
+    out_axis_t output_temp;
 
-    input.read(temp);
+    input.read(input_temp);
     shift_polyphase_filter_register_loop:
     for (int i = 4; i > 0; i--) {
     #pragma HLS UNROLL
         shift_register[DECIMATION_FACTOR - 1 - count][i] = shift_register[DECIMATION_FACTOR - 1 - count][i - 1];
     }
-    shift_register[DECIMATION_FACTOR - 1 - count][0] = temp.data;
+    shift_register[DECIMATION_FACTOR - 1 - count][0] = input_temp.data;
     acc_t sum_each = 0;
     polyphase_filter_convolution_loop:
     for (int i = 0; i < 5; i++) {
@@ -47,10 +50,13 @@ void fir_decimation_filter(hls::stream<axis_t>& input, hls::stream<axis_t>& outp
     }
     sum += sum_each;
     if (count == DECIMATION_FACTOR - 1) {
-        temp.data = (data_t)sum;
+        output_temp.data = (output_t)sum;
+        output_temp.keep = -1;
+        output_temp.strb = -1;
+        output_temp.last = input_temp.last;
         count = 0;
         sum = 0;
-        output.write(temp);
+        output.write(output_temp);
     }
     else {
         count++;

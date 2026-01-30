@@ -3,7 +3,7 @@
 #include "hls_stream.h"
 #include "ap_axi_sdata.h"
 
-#define NUM_TAPS 41
+#define NUM_TAPS 44
 #define DECIMATION_FACTOR 2
 
 typedef ap_fixed<16, 1> coef_t;
@@ -17,11 +17,11 @@ void low_pass_filter_second(hls::stream<axis_t>& input, hls::stream<axis_t>& out
 #pragma HLS INTERFACE mode = axis port = output
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return 
 
-    static const coef_t coefficient[DECIMATION_FACTOR][21] = {
-        { -0.0107683800, 0.0062336500, 0.0006361500, -0.0095155100, 0.0195094100, -0.0173742800, 0.0004812400, 0.0350721400, -0.0763216100, 0.1119882700, 0.3754555000, 0.1119882700, -0.0763216100, 0.0350721400, 0.0004812400, -0.0173742800, 0.0195094100, -0.0095155100, 0.0006361500, 0.0062336500, -0.0107683800 },
-        { -0.0018394800, 0.0091379200, -0.0108128800, 0.0068571200, 0.0089052900, -0.0266671800, 0.0380890500, -0.0225703600, -0.0393553600, 0.2938796800, 0.2938796800, -0.0393553600, -0.0225703600, 0.0380890500, -0.0266671800, 0.0089052900, 0.0068571200, -0.0108128800, 0.0091379200, -0.0018394800, 0.0000000000 },
+    static const coef_t coefficient[DECIMATION_FACTOR][22] = {
+        { 0.03948975, -0.01016235,  0.00271606,  0.00653076, -0.01870728,  0.02432251, -0.02178955,  0.00369263,  0.02966309, -0.08453369,  0.20266724,  0.37078857,  0.00427246, -0.04403687,  0.04653931, -0.03201294,  0.01354980,  0.00415039, -0.01318359,  0.01623535, -0.01074219,  0.00463867},
+        { 0.00463867, -0.01074219,  0.01623535, -0.01318359,  0.00415039,  0.01354980, -0.03201294,  0.04653931, -0.04403687,  0.00427246,  0.37078857,  0.20266724, -0.08453369,  0.02966309,  0.00369263, -0.02178955,  0.02432251, -0.01870728,  0.00653076,  0.00271606, -0.01016235,  0.03948975}
     };
-    static data_t shift_register[DECIMATION_FACTOR][21];
+    static data_t shift_register[DECIMATION_FACTOR][22];
     #pragma HLS ARRAY_PARTITION variable = coefficient type = complete dim = 0
     #pragma HLS ARRAY_PARTITION variable = shift_register type = complete dim = 0
 
@@ -31,14 +31,14 @@ void low_pass_filter_second(hls::stream<axis_t>& input, hls::stream<axis_t>& out
 
     input.read(temp);
     shift_polyphase_filter_register_loop:
-    for (int i = 20; i > 0; i--) {
+    for (int i = 21; i > 0; i--) {
     #pragma HLS UNROLL
         shift_register[DECIMATION_FACTOR - 1 - count][i] = shift_register[DECIMATION_FACTOR - 1 - count][i - 1];
     }
     shift_register[DECIMATION_FACTOR - 1 - count][0] = temp.data;
     acc_t sum_each = 0;
     polyphase_filter_convolution_loop:
-    for (int i = 0; i < 21; i++) {
+    for (int i = 0; i < 22; i++) {
     #pragma HLS UNROLL
         sum_each += shift_register[DECIMATION_FACTOR - 1 - count][i] * coefficient[DECIMATION_FACTOR - 1 - count][i];
     }
