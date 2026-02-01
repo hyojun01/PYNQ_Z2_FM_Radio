@@ -130,6 +130,7 @@ fs = 1920000   # Sample rate
 
 ## 🙏 Acknowledgments
 
+- [fm-demod-rtlsdr-pynqz2](https://github.com/hfwang132/fm-demod-rtlsdr-pynqz2) - Reference implementation
 - [PYNQ Project](http://www.pynq.io/)
 - [RTL-SDR](https://www.rtl-sdr.com/)
 - Xilinx Vitis HLS
