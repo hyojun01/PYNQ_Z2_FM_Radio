@@ -8,7 +8,7 @@
 
 typedef ap_fixed<16, 1> coef_t;
 typedef ap_fixed<8, 1> input_t;
-typedef ap_fixed<16, 1> output_t;
+typedef ap_fixed<32, 10> output_t;
 typedef ap_fixed<32, 10> acc_t;
 typedef hls::axis<input_t, 0, 0, 0> in_axis_t;
 typedef hls::axis<output_t, 0, 0, 0> out_axis_t;

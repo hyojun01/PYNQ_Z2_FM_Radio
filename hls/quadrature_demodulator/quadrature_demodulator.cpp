@@ -4,9 +4,9 @@
 #include "ap_axi_sdata.h"
 
 typedef ap_fixed<32, 10> acc_t;
-typedef ap_fixed<16, 1> complex_t;
+typedef ap_fixed<32, 10> complex_t;
 typedef hls::axis<complex_t, 0, 0, 0> axis_in_t;
-typedef ap_fixed<16, 1> data_t;
+typedef ap_fixed<32, 10> data_t;
 typedef hls::axis<data_t, 0, 0, 0> axis_out_t;
 
 #define NUM_TAPS 3
@@ -18,9 +18,9 @@ void quadrature_demodulator(hls::stream<axis_in_t>& real, hls::stream<axis_in_t>
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return 
 
     static complex_t shift_register_real[NUM_TAPS];
-    static complex_t shitf_register_imag[NUM_TAPS];
+    static complex_t shift_register_imag[NUM_TAPS];
     #pragma HLS ARRAY_PARTITION variable = shift_register_real type = complete dim = 0
-    #pragma HLS ARRAY_PARTITION variable = shitf_register_imag type = complete dim = 0
+    #pragma HLS ARRAY_PARTITION variable = shift_register_imag type = complete dim = 0
 
     axis_in_t temp_real;
     axis_in_t temp_imag;
@@ -31,7 +31,7 @@ void quadrature_demodulator(hls::stream<axis_in_t>& real, hls::stream<axis_in_t>
     acc_t diff_imag;
 
     // const data_t scaling_factor = 61274.6530904;
-    const acc_t scaling_factor = 8;
+    const acc_t scaling_factor = 1;
 
     // Operation
 
@@ -48,12 +48,12 @@ void quadrature_demodulator(hls::stream<axis_in_t>& real, hls::stream<axis_in_t>
     imag_register_shift_loop:
     for (int i = NUM_TAPS - 1; i > 0; i--) {
     #pragma HLS UNROLL
-        shitf_register_imag[i] = shitf_register_imag[i - 1];
+        shift_register_imag[i] = shift_register_imag[i - 1];
     }
-    shitf_register_imag[0] = temp_imag.data;
+    shift_register_imag[0] = temp_imag.data;
 
     diff_real = shift_register_real[0] - shift_register_real[2];
-    diff_imag = shitf_register_imag[0] - shitf_register_imag[2];
+    diff_imag = shift_register_imag[0] - shift_register_imag[2];
 
     result = temp_real.data * diff_imag - temp_imag.data * diff_real;
     result = result * scaling_factor;

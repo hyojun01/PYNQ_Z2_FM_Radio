@@ -7,7 +7,7 @@
 #define DECIMATION_FACTOR 4
 
 typedef ap_fixed<16, 1> coef_t;
-typedef ap_fixed<16, 1> data_t;
+typedef ap_fixed<32, 10> data_t;
 typedef ap_fixed<32, 10> acc_t;
 typedef hls::axis<data_t, 0, 0, 0> axis_t;
 typedef ap_uint<2> count_t;
