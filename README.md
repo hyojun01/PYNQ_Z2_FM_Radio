@@ -36,7 +36,8 @@ PYNQ_Z2_FM_Radio/
 ├── pynq/                         # PYNQ Jupyter notebook examples
 │   ├── plot_test.ipynb           # Signal visualization test
 │   ├── pynq_fm_test.ipynb        # RTL-SDR connection & HW/SW comparison
-│   └── pynq_fm_streaming.ipynb   # Real-time FM streaming example
+│   ├── pynq_fm_streaming.ipynb   # Real-time FM streaming example
+│   └── pynq_fm_streaming_version_2.ipynb  # Async pipeline streaming (improved)
 └── vivado/                       # Vivado project files
     ├── pynq_fm.bit               # FPGA bitstream
     ├── pynq_fm.hwh               # Hardware handoff file
@@ -128,7 +129,50 @@ fs = 1920000   # Sample rate
 | Fixed-Point Precision | 8-bit input, 16-bit output |
 | HLS Target Clock | 100 MHz |
 
-## 🙏 Acknowledgments
+## � Async Pipeline Architecture (Version 2)
+
+The `pynq_fm_streaming_version_2.ipynb` implements an efficient asynchronous pipeline using Python's `asyncio` for improved streaming performance.
+
+### Pipeline Structure
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Reader    │────▶│  Processor  │────▶│   Player    │
+│   (Task 1)  │     │   (Task 2)  │     │   (Task 3)  │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                   │                   │
+   RTL-SDR            FPGA DMA            Audio Output
+   Streaming          Processing          Playback
+```
+
+### Task Descriptions
+
+| Task | Role | Description |
+|------|------|-------------|
+| **Reader** | Producer | Reads raw IQ data from RTL-SDR asynchronously |
+| **Processor** | Transformer | Converts data format and transfers to FPGA via DMA |
+| **Player** | Consumer | Plays processed audio output |
+
+### Key Features
+
+- **Async Queue**: Uses `asyncio.Queue` with `maxsize=3` for backpressure control
+- **Double Buffering**: Queue-based architecture provides smooth data flow
+- **Non-blocking I/O**: Each task runs concurrently without blocking others
+- **Memory Safety**: Audio data is copied before passing between tasks
+
+```python
+# Pipeline execution example
+raw_queue = asyncio.Queue(maxsize=3)
+audio_queue = asyncio.Queue(maxsize=3)
+
+task1 = asyncio.create_task(reader_task(raw_queue, ITERATION_NUM))
+task2 = asyncio.create_task(processor_task(raw_queue, audio_queue))
+task3 = asyncio.create_task(player_task(audio_queue))
+
+await asyncio.gather(task1, task2, task3)
+```
+
+## �🙏 Acknowledgments
 
 - [fm-demod-rtlsdr-pynqz2](https://github.com/hfwang132/fm-demod-rtlsdr-pynqz2) - Reference implementation
 - [PYNQ Project](http://www.pynq.io/)
